@@ -1,6 +1,6 @@
 import pandas as pd
 
-dataSet = './adult.data'
+dataSet = './sikko.data'
 df = pd.read_csv(dataSet, header=None)
 
 minSupport = 2
