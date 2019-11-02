@@ -4,7 +4,6 @@ dataSet = './sikko.data'
 df = pd.read_csv(dataSet, header=None)
 
 minSupport = 2
-minConfidence = 60
 
 itemAppearanceSet = {}
 colCount = df.shape[1]
@@ -65,6 +64,20 @@ def calculate_set_freq(item_set):
     return item_set_freq
 
 
+def printFrozenSet(fs):
+    retval = ''
+    for i in fs:
+        retval = retval + i + ' '
+
+    return retval
+
+
+def printTable(hashTable, count):
+    for key in hashTable.keys():
+        if (len(key) == count) and type(key) == frozenset:
+            print(printFrozenSet(key), ' ', hashTable[key])
+
+
 for i in range(len(items) - 1):
     for j in range(i + 1, len(items)):
         itemSet = frozenset([items[i], items[j]])
@@ -72,4 +85,7 @@ for i in range(len(items) - 1):
 
 remove_low_freq()
 
-print(itemFreq)
+# print(itemFreq)
+printTable(itemFreq, 2)
+
+

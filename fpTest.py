@@ -123,4 +123,18 @@ def mineTree(headerTable, minSup, preFix, freqItemList, level=0):
             mineTree(myHead, minSup, newFreqSet, freqItemList, level + 1)
 
 
+import pandas as pd
 
+dataSet = './sikko.data'
+df = pd.read_csv(dataSet, header=None)
+
+df.dropna(inplace=True)
+
+# converting to dict
+data_dict = df.to_dict()
+
+# display
+print(data_dict)
+
+tree = createTree(data_dict, 2)
+print('Done')
