@@ -1,67 +1,22 @@
 import pandas as pd
+import itertools
 
-dataSet = './sikko.data'
+dataSet = './adult.data'
+# dataSet = './sikko.data'
 df = pd.read_csv(dataSet, header=None)
 
-minSupport = 2
-
-itemAppearanceSet = {}
-colCount = df.shape[1]
+itemApperanceMap = {}
 itemFreq = {}
-for index, row in df.iterrows():
-    for i in range(colCount):
-        val = row[i]
-        if not pd.isna(df.iloc[index, i]):
-            if val not in itemAppearanceSet:
-                appearanceSet = set()
-                itemAppearanceSet[val] = appearanceSet
-
-            itemAppearanceSet[val].add(index)
-
-            if val in itemFreq:
-                itemFreq[val] += 1
-            else:
-                itemFreq[val] = 1
+supportedItemFreq = {}
 
 
-def remove_low_freq():
-    low_freq_items = []
+def self_join_items(depth):
+    uniqueElements = []
 
-    for item_set in itemFreq:
-        freq = itemFreq[item_set]
-        if freq < minSupport:
-            low_freq_items.append(item_set)
+    for key in itemApperanceMap.keys():
+        uniqueElements.append(key)
 
-    for low_freq_item in low_freq_items:
-        del itemFreq[low_freq_item]
-
-
-remove_low_freq()
-itemSetFreq = {}
-items = []
-for item in itemFreq:
-    items.append(item)
-
-
-def calculate_set_freq(item_set):
-    common = set()
-    uncommon_items = []
-
-    for set_item in item_set:
-        if len(common) == 0:
-            common.update(itemAppearanceSet[set_item])
-        else:
-            tmp = itemAppearanceSet[set_item]
-            for maybeCommonItem in common:
-                if maybeCommonItem not in tmp:
-                    uncommon_items.append(maybeCommonItem)
-
-    for un_common_item in uncommon_items:
-        common.remove(un_common_item)
-
-    item_set_freq = len(common)
-    itemFreq[item_set] = item_set_freq
-    return item_set_freq
+    return itertools.combinations(uniqueElements, depth + 1)
 
 
 def printFrozenSet(fs):
@@ -78,14 +33,79 @@ def printTable(hashTable, count):
             print(printFrozenSet(key), ' ', hashTable[key])
 
 
+def calculate_set_freq(item_set):
+    appearanceSets = []
+    for set_item in item_set:
+        appearanceSets.append(itemApperanceMap[set_item])
+
+    intersection = appearanceSets[0]
+    for i in range(1, len(appearanceSets)):
+        intersection = intersection.intersection(appearanceSets[i])
+
+    return len(intersection)
+
+
+def addKeyToMaps(key, value):
+    itemFreq[key] = value
+    supportedItemFreq[key] = value
+
+
+def remove_low_freq():
+    low_freq_items = []
+
+    for item_set in itemFreq:
+        freq = itemFreq[item_set]
+        if freq < minSupport:
+            low_freq_items.append(item_set)
+
+    for low_freq_item in low_freq_items:
+        del supportedItemFreq[low_freq_item]
+
+
+minSupport = 2
+colCount = df.shape[1]
+
+for index, row in df.iterrows():
+    for i in range(colCount):
+        val = row[i]
+        if not pd.isna(df.iloc[index, i]):
+            if val not in itemApperanceMap:
+                appearanceSet = set()
+                itemApperanceMap[val] = appearanceSet
+
+            itemApperanceMap[val].add(index)
+
+            if val in itemFreq:
+                newVal = itemFreq[val] + 1
+                addKeyToMaps(val, newVal)
+            else:
+                addKeyToMaps(val, 1)
+
+remove_low_freq()
+items = []
+for item in itemFreq:
+    items.append(item)
+
 for i in range(len(items) - 1):
     for j in range(i + 1, len(items)):
         itemSet = frozenset([items[i], items[j]])
-        itemSetFreq[itemSet] = calculate_set_freq(itemSet)
+        setFreq = calculate_set_freq(itemSet)
+        addKeyToMaps(itemSet, setFreq)
 
 remove_low_freq()
 
-# print(itemFreq)
-printTable(itemFreq, 2)
+printTable(supportedItemFreq, 2)
+
+selfJoinTableResult = []
+selfJoinTable = self_join_items(2)
+
+for awd in selfJoinTable:
+    selfJoinTableResult.append(awd)
+
+for asd in selfJoinTableResult:
+    joined_sample = set()
+    for t in asd:
+        joined_sample.add(t)
+    print(asd, ' ', calculate_set_freq(frozenset(joined_sample)))
 
 
