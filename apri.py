@@ -1,8 +1,8 @@
 import pandas as pd
 import itertools
 
-dataSet = './adult.data'
-# dataSet = './sikko.data'
+# dataSet = './adult.data'
+dataSet = './sikko.data'
 df = pd.read_csv(dataSet, header=None)
 
 itemApperanceMap = {}
@@ -10,13 +10,26 @@ itemFreq = {}
 supportedItemFreq = {}
 
 
-def self_join_items(depth):
+def check_depth_support(check_depth):
+    if check_depth == 0:
+        for itemSet in supportedItemFreq:
+            if type(itemSet) == str:
+                return True
+        return False
+    else:
+        for itemSet in supportedItemFreq:
+            if (type(itemSet) == frozenset) and len(itemSet) == (check_depth + 1):
+                return True
+        return False
+
+
+def self_join_items(join_depth):
     uniqueElements = []
 
     for key in itemApperanceMap.keys():
         uniqueElements.append(key)
 
-    return itertools.combinations(uniqueElements, depth + 1)
+    return itertools.combinations(uniqueElements, join_depth + 1)
 
 
 def printFrozenSet(fs):
@@ -59,7 +72,8 @@ def remove_low_freq():
             low_freq_items.append(item_set)
 
     for low_freq_item in low_freq_items:
-        del supportedItemFreq[low_freq_item]
+        if low_freq_item in supportedItemFreq:
+            del supportedItemFreq[low_freq_item]
 
 
 minSupport = 2
@@ -82,30 +96,28 @@ for index, row in df.iterrows():
                 addKeyToMaps(val, 1)
 
 remove_low_freq()
-items = []
-for item in itemFreq:
-    items.append(item)
+depth = 0
 
-for i in range(len(items) - 1):
-    for j in range(i + 1, len(items)):
-        itemSet = frozenset([items[i], items[j]])
-        setFreq = calculate_set_freq(itemSet)
-        addKeyToMaps(itemSet, setFreq)
+while check_depth_support(depth):
+    depth = depth + 1
+    selfJoinTableResult = []
+    selfJoinTable = self_join_items(depth)
 
-remove_low_freq()
+    for selfJoinResult in selfJoinTable:
+        selfJoinTableResult.append(selfJoinResult)
 
-printTable(supportedItemFreq, 2)
+    for selfJoinResultElement in selfJoinTableResult:
+        joined_sample = set()
+        for elementInner in selfJoinResultElement:
+            joined_sample.add(elementInner)
 
-selfJoinTableResult = []
-selfJoinTable = self_join_items(2)
+        selfJoinResultElementFrozenSet = frozenset(joined_sample)
+        selfJoinResultElementFreq = calculate_set_freq(selfJoinResultElementFrozenSet)
+        addKeyToMaps(selfJoinResultElementFrozenSet, selfJoinResultElementFreq)
+        # print(selfJoinResultElement, ' ', calculate_set_freq(frozenset(joined_sample)))
 
-for awd in selfJoinTable:
-    selfJoinTableResult.append(awd)
+    remove_low_freq()
 
-for asd in selfJoinTableResult:
-    joined_sample = set()
-    for t in asd:
-        joined_sample.add(t)
-    print(asd, ' ', calculate_set_freq(frozenset(joined_sample)))
+print('Final depth that we can support:', depth)
 
-
+printTable(supportedItemFreq, depth)
