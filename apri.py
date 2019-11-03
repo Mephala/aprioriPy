@@ -78,6 +78,7 @@ def remove_low_freq():
 
 minSupport = 2
 colCount = df.shape[1]
+print('Running with min support:', minSupport)
 
 for index, row in df.iterrows():
     for i in range(colCount):
@@ -95,11 +96,13 @@ for index, row in df.iterrows():
             else:
                 addKeyToMaps(val, 1)
 
+print('Completed variable indexing, starting self-join procedure')
 remove_low_freq()
 depth = 0
 
 while check_depth_support(depth):
     depth = depth + 1
+    print('Creating tables with level:', depth + 1)
     selfJoinTableResult = []
     selfJoinTable = self_join_items(depth)
 
@@ -114,8 +117,8 @@ while check_depth_support(depth):
         selfJoinResultElementFrozenSet = frozenset(joined_sample)
         selfJoinResultElementFreq = calculate_set_freq(selfJoinResultElementFrozenSet)
         addKeyToMaps(selfJoinResultElementFrozenSet, selfJoinResultElementFreq)
-        # print(selfJoinResultElement, ' ', calculate_set_freq(frozenset(joined_sample)))
 
+    print('Completed creating tables with level:', depth + 1, 'testing support range.')
     remove_low_freq()
 
 print('Final depth that we can support:', depth)
