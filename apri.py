@@ -3,12 +3,14 @@ import itertools
 
 # dataSet = './adult.data'
 # dataSet = './sikko.data'
-dataSet = './adult-min.data'
+# dataSet = './adult-min.data'
+dataSet = './adul5.data'
 df = pd.read_csv(dataSet, header=None)
 
 itemApperanceMap = {}
 itemFreq = {}
 supportedItemFreq = {}
+minSupport = 3
 
 
 def check_depth_support(check_depth):
@@ -35,16 +37,22 @@ def self_join_items(join_depth):
 
 def printFrozenSet(fs):
     retval = ''
-    for i in fs:
-        retval = retval + i + ' '
+
+    for fs_element in fs:
+        if type(fs_element) == int:
+            retval = retval + str(fs_element) + ' '
+        else:
+            retval = retval + fs_element + ' '
 
     return retval
 
 
 def printTable(hashTable, count):
     for key in hashTable.keys():
-        if (len(key) == count) and type(key) == frozenset:
+        if type(key) == frozenset and len(key) == count:
             print(printFrozenSet(key), ' ', hashTable[key])
+        else:
+            print(key, ' ', hashTable[key])
 
 
 def calculate_set_freq(item_set):
@@ -77,7 +85,6 @@ def remove_low_freq():
             del supportedItemFreq[low_freq_item]
 
 
-minSupport = 2
 colCount = df.shape[1]
 print('Running with min support:', minSupport)
 
