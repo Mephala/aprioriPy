@@ -128,6 +128,7 @@ while check_depth_support(depth):
 
     print('Completed creating tables with level:', depth + 1, 'testing support range.')
     remove_low_freq()
+    # cim cif
 
 print('Final depth that we can support:', depth)
 
