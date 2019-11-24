@@ -1,16 +1,29 @@
 import pandas as pd
 import itertools
+import time
 
-# dataSet = './adult.data'
-# dataSet = './sikko.data'
-# dataSet = './adult-min.data'
-dataSet = './adul5.data'
+start=time.time()
+
+#dataSet = './adultap5.csv'
+#dataSet = './adultap10.csv'
+#dataSet = './adultap20.csv'
+#dataSet = './adultap30.csv'
+#dataSet = './adultap40.csv'
+#dataSet = './adultap50.csv'
+#dataSet = './adultap60.csv'
+#dataSet = './adultap70.csv'
+#dataSet = './adultap80.csv'
+#dataSet = './adultap90.csv'
+dataSet = './adultap100.csv'
+
+
+
 df = pd.read_csv(dataSet, header=None)
 
 itemApperanceMap = {}
 itemFreq = {}
 supportedItemFreq = {}
-minSupport = 3
+minSupport = 80
 
 
 def check_depth_support(check_depth):
@@ -207,3 +220,7 @@ while check_depth_support(depth):
 print('Final depth that we can support:', depth)
 
 printTable(supportedItemFreq, depth)
+
+difference = time.time() - start
+
+print('Run time:', difference, ' seconds.')
