@@ -6,8 +6,6 @@ start=time.time()
 
 #dataSet = './adult.data'
 dataSet = './adultap100.csv'
-
-
 df = pd.read_csv(dataSet, header=None)
 
 itemApperanceMap = {}
