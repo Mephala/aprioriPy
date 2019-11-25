@@ -4,18 +4,8 @@ import time
 
 start=time.time()
 
-#dataSet = './adultap5.csv'
-#dataSet = './adultap10.csv'
-#dataSet = './adultap20.csv'
-#dataSet = './adultap30.csv'
-#dataSet = './adultap40.csv'
-#dataSet = './adultap50.csv'
-#dataSet = './adultap60.csv'
-#dataSet = './adultap70.csv'
-#dataSet = './adultap80.csv'
-#dataSet = './adultap90.csv'
+#dataSet = './adult.data'
 dataSet = './adultap100.csv'
-
 
 
 df = pd.read_csv(dataSet, header=None)
@@ -23,7 +13,7 @@ df = pd.read_csv(dataSet, header=None)
 itemApperanceMap = {}
 itemFreq = {}
 supportedItemFreq = {}
-minSupport = 80
+minSupport = 2
 
 
 def check_depth_support(check_depth):
